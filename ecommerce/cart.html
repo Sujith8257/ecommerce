@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopX - Cart</title>
+  <link rel="stylesheet" href="./assets/css/style-prefix.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <main class="container section">
+    <h1>Cart</h1>
+    <div id="cart"></div>
+    <div style="margin-top:16px; display:flex; gap:8px;">
+      <a class="btn" id="checkout" href="/ecommerce/checkout.html">Checkout</a>
+      <a class="btn ghost" href="/ecommerce/products.html">Continue shopping</a>
+    </div>
+  </main>
+
+  <script type="module">
+    import { readCart, setCartQuantity, removeFromCart, getActivePrice, onAuthChange } from './assets/js/app.js';
+    import { getProduct } from './assets/js/app.js';
+    import './assets/js/firebase.js';
+
+    let cachedProfile = null; onAuthChange((u,p)=> cachedProfile = p);
+
+    // Support add param from index
+    const add = new URLSearchParams(location.search).get('add');
+    if (add) { import('./assets/js/app.js').then(m => m.addToCart(add,1)); history.replaceState({}, '', '/ecommerce/cart.html'); }
+
+    async function render() {
+      const items = readCart();
+      if (!items.length) { document.getElementById('cart').innerHTML = '<p>Your cart is empty.</p>'; return; }
+      const rows = [];
+      let total = 0;
+      for (const item of items) {
+        const p = await getProduct(item.productId);
+        if (!p) continue;
+        const price = getActivePrice(p, cachedProfile);
+        const line = price * item.quantity;
+        total += line;
+        rows.push(`<tr><td>${p.title}</td><td>$${price.toFixed(2)}</td><td><input type="number" min="1" value="${item.quantity}" data-q="${p.id}" style="width:80px"/></td><td>$${line.toFixed(2)}</td><td><button data-rm="${p.id}">Remove</button></td></tr>`);
+      }
+      document.getElementById('cart').innerHTML = `
+        <table class="table"><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table>
+        <h3 style="text-align:right;">Total: $${total.toFixed(2)}</h3>`;
+      document.querySelectorAll('input[data-q]').forEach(inp => {
+        inp.addEventListener('change', (e) => {
+          import('./assets/js/app.js').then(m => m.setCartQuantity(inp.getAttribute('data-q'), parseInt(inp.value||'1',10)) ).then(render);
+        });
+      });
+      document.querySelectorAll('button[data-rm]').forEach(btn => {
+        btn.addEventListener('click', () => { import('./assets/js/app.js').then(m => m.removeFromCart(btn.getAttribute('data-rm')) ).then(render); });
+      });
+    }
+    render();
+  </script>
+</body>
+</html>

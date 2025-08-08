@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopX - Product</title>
+  <link rel="stylesheet" href="./assets/css/style-prefix.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <main class="container section">
+    <a href="/ecommerce/products.html">← Back to products</a>
+    <div id="content" class="section"></div>
+  </main>
+
+  <div id="role-modal">
+    <div class="panel">
+      <h3>Choose your account type</h3>
+      <p class="muted">This cannot be changed later.</p>
+      <div class="choices">
+        <button data-role-retailer>Retailer</button>
+        <button data-role-company class="ghost">Company</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { onAuthChange, getActivePrice, addToCart } from './assets/js/app.js';
+    import { getProduct } from './assets/js/app.js';
+    import './assets/js/firebase.js';
+
+    let cachedProfile = null; onAuthChange((u,p) => cachedProfile = p);
+
+    const id = new URLSearchParams(location.search).get('id');
+    async function render() {
+      const p = await getProduct(id);
+      if (!p) { document.getElementById('content').innerHTML = '<p>Product not found.</p>'; return; }
+      const price = getActivePrice(p, cachedProfile);
+      const img = p.imageUrl || 'https://picsum.photos/seed/' + p.title.replace(/\s+/g,'-') + '/800/500';
+      document.getElementById('content').innerHTML = `
+        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div><img class="card" style="max-width:100%" src="${img}" alt="${p.title}" /></div>
+          <div>
+            <h1>${p.title}</h1>
+            <div class="muted">${p.category||''}</div>
+            <p>${p.description || ''}</p>
+            <div class="price" style="font-size:24px; margin: 8px 0;">$${(price||0).toFixed(2)}</div>
+            <div style="display:flex; gap:8px;">
+              <button id="add">Add to cart</button>
+              <a class="btn ghost" href="/ecommerce/cart.html">Go to cart</a>
+            </div>
+          </div>
+        </div>`;
+      document.getElementById('add').addEventListener('click', () => { addToCart(p.id, 1); alert('Added to cart'); });
+    }
+    render();
+  </script>
+</body>
+</html>

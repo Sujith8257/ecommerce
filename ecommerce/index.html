@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopX - Home</title>
+  <link rel="stylesheet" href="./assets/css/style-prefix.css" />
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <a href="/ecommerce/index.html"><strong>ShopX</strong></a>
+      <nav>
+        <a href="/ecommerce/products.html">Products</a>
+        <a href="/ecommerce/cart.html">Cart</a>
+        <a href="/ecommerce/profile.html">Account</a>
+        <a href="/ecommerce/admin.html">Admin</a>
+        <a href="/ecommerce/delivery.html">Delivery</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="ghost" data-login>Sign in with Google</button>
+        <button data-logout class="hidden">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section">
+      <h1>Trending Products</h1>
+      <p class="muted">Role-based pricing for Retailers and Companies.</p>
+      <div id="products" class="grid products"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">&copy; <span id="year"></span> ShopX</div>
+  </footer>
+
+  <div id="role-modal">
+    <div class="panel">
+      <h3>Choose your account type</h3>
+      <p class="muted">This cannot be changed later.</p>
+      <div class="choices">
+        <button data-role-retailer>Retailer</button>
+        <button data-role-company class="ghost">Company</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { signInWithGoogleAndMaybePickRole, signOut, onAuthChange, wireAuthButtons, listActiveProducts, getActivePrice } from './assets/js/app.js';
+    import './assets/js/firebase.js';
+
+    wireAuthButtons();
+
+    const year = document.getElementById('year');
+    year.textContent = new Date().getFullYear();
+
+    const productsEl = document.getElementById('products');
+
+    let cachedProfile = null;
+    onAuthChange(async (user, profile) => {
+      cachedProfile = profile;
+      document.querySelector('[data-login]').classList.toggle('hidden', !!user);
+      document.querySelector('[data-logout]').classList.toggle('hidden', !user);
+    });
+
+    async function renderProducts() {
+      const products = await listActiveProducts(20);
+      productsEl.innerHTML = products.map((p) => {
+        const price = getActivePrice(p, cachedProfile);
+        const img = p.imageUrl || 'https://picsum.photos/seed/' + p.title.replace(/\s+/g, '-') + '/400/300';
+        return `
+          <div class="card">
+            <img src="${img}" alt="${p.title}"/>
+            <div class="p">
+              <div class="muted">${p.category || ''}</div>
+              <h3>${p.title}</h3>
+              <div class="price">$${(price || 0).toFixed(2)}</div>
+              <div style="margin-top:8px; display:flex; gap:8px;">
+                <a class="btn" href="/ecommerce/product.html?id=${p.id}">View</a>
+                <a class="btn ghost" href="/ecommerce/cart.html?add=${p.id}">Add to cart</a>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    renderProducts();
+  </script>
+
+</body>
+</html>
