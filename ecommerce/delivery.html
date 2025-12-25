@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopX - Delivery</title>
+  <link rel="stylesheet" href="./assets/css/style-prefix.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <main class="container section">
+    <h1>Delivery Portal</h1>
+    <p class="muted">See orders assigned to you and update delivery status.</p>
+    <div id="orders"></div>
+  </main>
+
+  <script type="module">
+    import { onAuthChange } from './assets/js/app.js';
+    import { listAssignedOrders, updateDeliveryStatus } from './assets/js/app.js';
+    import './assets/js/firebase.js';
+
+    let user=null, profile=null;
+    onAuthChange(async (u,p)=>{ user=u; profile=p; if(!u){ location.href='/ecommerce/login.html'; return; } if(!p?.isDelivery && !p?.isAdmin){ document.body.innerHTML='<main class="container section"><h2>Access denied</h2><p>Delivery or Admin only.</p></main>'; return; } render(); });
+
+    async function render(){
+      const ords = await listAssignedOrders(user.uid);
+      if (!ords.length) { document.getElementById('orders').innerHTML = '<p>No assigned orders.</p>'; return; }
+      document.getElementById('orders').innerHTML = ords.map(o=>`<div class="card"><div class="p"><div class="muted">${o.id}</div><div>Status: <strong>${o.status}</strong></div><div>Packages: ${o.items.length} | Total: $${(o.subtotal||0).toFixed(2)}</div><div style="margin-top:8px; display:flex; gap:8px;"><button data-st="out_for_delivery" data-id="${o.id}">Out for delivery</button><button class="ghost" data-st="delivered" data-id="${o.id}">Delivered</button></div></div></div>`).join('');
+      document.querySelectorAll('button[data-st]').forEach(btn=> btn.addEventListener('click', async ()=>{ await updateDeliveryStatus(btn.getAttribute('data-id'), btn.getAttribute('data-st')); await render(); }));
+    }
+  </script>
+</body>
+</html>

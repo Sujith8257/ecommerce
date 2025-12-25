@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopX - Checkout</title>
+  <link rel="stylesheet" href="./assets/css/style-prefix.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <main class="container section" style="max-width:720px;">
+    <h1>Checkout</h1>
+    <form id="form">
+      <div class="form-row">
+        <div><label>Full name</label><input class="input" required id="name"></div>
+        <div><label>Phone</label><input class="input" required id="phone"></div>
+      </div>
+      <div><label>Address</label><textarea class="input" required id="addr"></textarea></div>
+      <div style="margin-top:12px;"><button type="submit">Place order</button> <a class="btn ghost" href="/ecommerce/cart.html">Back to cart</a></div>
+    </form>
+    <div id="result" class="section"></div>
+  </main>
+
+  <script type="module">
+    import { onAuthChange, readCart } from './assets/js/app.js';
+    import { createOrder } from './assets/js/app.js';
+    import './assets/js/firebase.js';
+
+    let currentUser = null, profile = null;
+    onAuthChange((u,p) => { currentUser = u; profile = p; });
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) { alert('Please sign in first'); location.href = '/ecommerce/login.html'; return; }
+      const items = readCart();
+      if (!items.length) { alert('Cart is empty'); location.href = '/ecommerce/products.html'; return; }
+      const order = await createOrder({ user: currentUser, profile, items });
+      localStorage.removeItem('ec_cart_v1');
+      document.getElementById('result').innerHTML = `<p>Order placed! ID: <strong>${order.id}</strong></p><a class="btn" href="/ecommerce/index.html">Continue shopping</a>`;
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

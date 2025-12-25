@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopX - Products</title>
+  <link rel="stylesheet" href="./assets/css/style-prefix.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <a href="/ecommerce/index.html"><strong>ShopX</strong></a>
+      <div class="nav-actions">
+        <button class="ghost" data-login>Sign in</button>
+        <button data-logout class="hidden">Sign out</button>
+      </div>
+    </div>
+  </header>
+  <main class="container section">
+    <div class="form-row" style="margin-bottom:16px;">
+      <div>
+        <label>Category</label>
+        <input class="input" id="cat" placeholder="e.g. Electronics" />
+      </div>
+      <div style="align-self:end;">
+        <button id="apply">Apply</button>
+      </div>
+    </div>
+    <div id="list" class="grid products"></div>
+  </main>
+
+  <div id="role-modal">
+    <div class="panel">
+      <h3>Choose your account type</h3>
+      <p class="muted">This cannot be changed later.</p>
+      <div class="choices">
+        <button data-role-retailer>Retailer</button>
+        <button data-role-company class="ghost">Company</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { wireAuthButtons, onAuthChange, getActivePrice } from './assets/js/app.js';
+    import { getFirestoreInstance } from './assets/js/firebase.js';
+    import './assets/js/firebase.js';
+
+    wireAuthButtons();
+
+    const db = getFirestoreInstance();
+    let cachedProfile = null;
+    onAuthChange((user, profile) => { cachedProfile = profile; });
+
+    async function queryProducts(category) {
+      let q = db.collection('products').where('active','==',true);
+      if (category) q = q.where('category','==',category);
+      const snap = await q.limit(100).get();
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    async function render() {
+      const category = new URLSearchParams(location.search).get('category') || document.getElementById('cat').value.trim();
+      const data = await queryProducts(category || null);
+      const list = document.getElementById('list');
+      list.innerHTML = data.map(p => {
+        const price = getActivePrice(p, cachedProfile);
+        const img = p.imageUrl || 'https://picsum.photos/seed/' + p.title.replace(/\s+/g,'-') + '/400/300';
+        return `<div class="card"><img src="${img}" alt="${p.title}"><div class="p"><div class="muted">${p.category||''}</div><h3>${p.title}</h3><div class="price">$${(price||0).toFixed(2)}</div><a class="btn" href="/ecommerce/product.html?id=${p.id}">View</a></div></div>`
+      }).join('');
+    }
+
+    document.getElementById('apply').addEventListener('click', render);
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true; }
+    function isDelivery() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isDelivery == true; }
+
+    match /users/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid || isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid &&
+        // User cannot change primaryRole after create
+        request.resource.data.primaryRole == resource.data.primaryRole &&
+        request.resource.data.isAdmin == resource.data.isAdmin &&
+        request.resource.data.isDelivery == resource.data.isDelivery
+        || isAdmin();
+    }
+
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{id} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid) || (isDelivery() && resource.data.assignedDeliveryUserId == request.auth.uid);
+      allow update: if isAdmin() || (isDelivery() && request.resource.data.assignedDeliveryUserId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+  }
+}
