@@ -18,7 +18,7 @@
         <div><label>Phone</label><input class="input" required id="phone"></div>
       </div>
       <div><label>Address</label><textarea class="input" required id="addr"></textarea></div>
-      <div style="margin-top:12px;"><button type="submit">Place order</button> <a class="btn ghost" href="/ecommerce/cart.html">Back to cart</a></div>
+      <div style="margin-top:12px;"><button type="submit">Place order</button> <a class="btn ghost" href="/cart.html">Back to cart</a></div>
     </form>
     <div id="result" class="section"></div>
   </main>
@@ -33,12 +33,12 @@
 
     document.getElementById('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentUser) { alert('Please sign in first'); location.href = '/ecommerce/login.html'; return; }
+      if (!currentUser) { alert('Please sign in first'); location.href = '/login.html'; return; }
       const items = readCart();
-      if (!items.length) { alert('Cart is empty'); location.href = '/ecommerce/products.html'; return; }
+      if (!items.length) { alert('Cart is empty'); location.href = '/products.html'; return; }
       const order = await createOrder({ user: currentUser, profile, items });
       localStorage.removeItem('ec_cart_v1');
-      document.getElementById('result').innerHTML = `<p>Order placed! ID: <strong>${order.id}</strong></p><a class="btn" href="/ecommerce/index.html">Continue shopping</a>`;
+      document.getElementById('result').innerHTML = `<p>Order placed! ID: <strong>${order.id}</strong></p><a class="btn" href="/index.html">Continue shopping</a>`;
       e.target.reset();
     });
   </script>

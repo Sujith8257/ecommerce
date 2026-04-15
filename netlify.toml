@@ -1,0 +1,7 @@
+# Static site — no bundler. App lives in ./ecommerce
+[build]
+  publish = "ecommerce"
+
+# Optional: pin Node only if you add a build step later
+# [build.environment]
+#   NODE_VERSION = "20"

@@ -23,7 +23,7 @@
     import './assets/js/firebase.js';
 
     let user=null, profile=null;
-    onAuthChange(async (u,p)=>{ user=u; profile=p; if(!u){ location.href='/ecommerce/login.html'; return;} render(); });
+    onAuthChange(async (u,p)=>{ user=u; profile=p; if(!u){ location.href='/login.html'; return;} render(); });
 
     async function render(){
       document.getElementById('info').innerHTML = `<p><strong>${user.displayName||user.email}</strong></p><p class="muted">Role: <strong>${profile?.primaryRole||'n/a'}</strong></p>`;

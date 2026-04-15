@@ -14,8 +14,8 @@
     <h1>Cart</h1>
     <div id="cart"></div>
     <div style="margin-top:16px; display:flex; gap:8px;">
-      <a class="btn" id="checkout" href="/ecommerce/checkout.html">Checkout</a>
-      <a class="btn ghost" href="/ecommerce/products.html">Continue shopping</a>
+      <a class="btn" id="checkout" href="/checkout.html">Checkout</a>
+      <a class="btn ghost" href="/products.html">Continue shopping</a>
     </div>
   </main>
 
@@ -28,7 +28,7 @@
 
     // Support add param from index
     const add = new URLSearchParams(location.search).get('add');
-    if (add) { import('./assets/js/app.js').then(m => m.addToCart(add,1)); history.replaceState({}, '', '/ecommerce/cart.html'); }
+    if (add) { import('./assets/js/app.js').then(m => m.addToCart(add,1)); history.replaceState({}, '', '/cart.html'); }
 
     async function render() {
       const items = readCart();

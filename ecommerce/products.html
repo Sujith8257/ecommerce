@@ -12,7 +12,7 @@
 <body>
   <header>
     <div class="container navbar">
-      <a href="/ecommerce/index.html"><strong>ShopX</strong></a>
+      <a href="/index.html"><strong>ShopX</strong></a>
       <div class="nav-actions">
         <button class="ghost" data-login>Sign in</button>
         <button data-logout class="hidden">Sign out</button>
@@ -68,7 +68,7 @@
       list.innerHTML = data.map(p => {
         const price = getActivePrice(p, cachedProfile);
         const img = p.imageUrl || 'https://picsum.photos/seed/' + p.title.replace(/\s+/g,'-') + '/400/300';
-        return `<div class="card"><img src="${img}" alt="${p.title}"><div class="p"><div class="muted">${p.category||''}</div><h3>${p.title}</h3><div class="price">$${(price||0).toFixed(2)}</div><a class="btn" href="/ecommerce/product.html?id=${p.id}">View</a></div></div>`
+        return `<div class="card"><img src="${img}" alt="${p.title}"><div class="p"><div class="muted">${p.category||''}</div><h3>${p.title}</h3><div class="price">$${(price||0).toFixed(2)}</div><a class="btn" href="/product.html?id=${p.id}">View</a></div></div>`
       }).join('');
     }
 

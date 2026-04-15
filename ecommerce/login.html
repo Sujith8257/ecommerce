@@ -15,7 +15,7 @@
     <p class="muted">Use Google to continue. You'll choose Retailer or Company on first login.</p>
     <div style="display:flex; gap:8px;">
       <button data-login>Sign in with Google</button>
-      <a class="btn ghost" href="/ecommerce/index.html">Back</a>
+      <a class="btn ghost" href="/index.html">Back</a>
     </div>
   </main>
 
@@ -35,7 +35,7 @@
     import './assets/js/firebase.js';
 
     wireAuthButtons();
-    onAuthChange((user) => { if (user) window.location.href = '/ecommerce/index.html'; });
+    onAuthChange((user) => { if (user) window.location.href = '/index.html'; });
   </script>
 </body>
 </html>

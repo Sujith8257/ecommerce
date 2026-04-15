@@ -59,7 +59,7 @@
 
     const db = getFirestoreInstance();
     let user=null, profile=null;
-    onAuthChange((u,p)=>{ user=u; profile=p; if(!u) { location.href='/ecommerce/login.html'; return; } if(!p?.isAdmin){ document.body.innerHTML='<main class="container section"><h2>Access denied</h2><p>Admin only.</p></main>'; } else { init(); } });
+    onAuthChange((u,p)=>{ user=u; profile=p; if(!u) { location.href='/login.html'; return; } if(!p?.isAdmin){ document.body.innerHTML='<main class="container section"><h2>Access denied</h2><p>Admin only.</p></main>'; } else { init(); } });
 
     function readForm() {
       return {

@@ -13,13 +13,13 @@
 <body>
   <header>
     <div class="container navbar">
-      <a href="/ecommerce/index.html"><strong>ShopX</strong></a>
+      <a href="/index.html"><strong>ShopX</strong></a>
       <nav>
-        <a href="/ecommerce/products.html">Products</a>
-        <a href="/ecommerce/cart.html">Cart</a>
-        <a href="/ecommerce/profile.html">Account</a>
-        <a href="/ecommerce/admin.html">Admin</a>
-        <a href="/ecommerce/delivery.html">Delivery</a>
+        <a href="/products.html">Products</a>
+        <a href="/cart.html">Cart</a>
+        <a href="/profile.html">Account</a>
+        <a href="/admin.html">Admin</a>
+        <a href="/delivery.html">Delivery</a>
       </nav>
       <div class="nav-actions">
         <button class="ghost" data-login>Sign in with Google</button>
@@ -82,8 +82,8 @@
               <h3>${p.title}</h3>
               <div class="price">$${(price || 0).toFixed(2)}</div>
               <div style="margin-top:8px; display:flex; gap:8px;">
-                <a class="btn" href="/ecommerce/product.html?id=${p.id}">View</a>
-                <a class="btn ghost" href="/ecommerce/cart.html?add=${p.id}">Add to cart</a>
+                <a class="btn" href="/product.html?id=${p.id}">View</a>
+                <a class="btn ghost" href="/cart.html?add=${p.id}">Add to cart</a>
               </div>
             </div>
           </div>`;
